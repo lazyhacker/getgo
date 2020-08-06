@@ -29,6 +29,7 @@ var (
 
 func main() {
 
+	flag.Parse()
 	// Get the OS and architecture
 	goos := runtime.GOOS
 	arch := runtime.GOARCH
