@@ -76,7 +76,7 @@ func main() {
 	sha256content := string(c)
 
 	// Check if the binary has already been downloaded.
-	filepath := *dl + gofile
+	filepath := *dl + string(os.PathSeparator) + gofile
 	if _, err := os.Stat(filepath); err == nil {
 		if m, _ := checksumMatch(filepath, sha256content); m {
 			log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
