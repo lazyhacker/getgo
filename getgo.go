@@ -47,6 +47,9 @@ func main() {
 		version = string(body)
 	}
 
+	if arch == "arm" {
+		arch = "armv6l"
+	}
 	var gofile string
 
 	// Construct the file name for the stable binary.
@@ -76,7 +79,12 @@ func main() {
 	sha256content := string(c)
 
 	// Check if the binary has already been downloaded.
-	filepath := *dl + string(os.PathSeparator) + gofile
+	var filepath string
+	if *dl != "" {
+		filepath = *dl + string(os.PathSeparator) + gofile
+	} else {
+		filepath = gofile
+	}
 	if _, err := os.Stat(filepath); err == nil {
 		if m, _ := checksumMatch(filepath, sha256content); m {
 			log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
