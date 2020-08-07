@@ -25,6 +25,7 @@ var (
 	sha_extension = ".sha256"
 	dl            = flag.String("dir", "", "Directory path to download to.")
 	version       = *flag.String("version", "", "Specific version to download (e.g. 1.14.7)")
+	show          = flag.Bool("show", false, "If true, print out the file downloaded.")
 )
 
 func main() {
@@ -116,6 +117,9 @@ func main() {
 		os.Remove(filepath)
 	}
 
+	if *show {
+		fmt.Printf("%v", filepath)
+	}
 }
 
 func checksumMatch(f, v string) (bool, string) {
