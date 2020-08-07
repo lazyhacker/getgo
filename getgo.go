@@ -101,7 +101,6 @@ func main() {
 	}
 	defer out.Close()
 
-	log.Printf("Downloading %v\n", download)
 	resp, err = http.Get(download)
 	if err != nil {
 		log.Fatalf("Unable to get the latest version number. %v", err)
