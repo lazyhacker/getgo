@@ -26,7 +26,7 @@ var (
 	dl            = flag.String("dir", "", "Directory path to download to.")
 	version       = *flag.String("version", "", "Specific version to download (e.g. 1.14.7)")
 	show          = flag.Bool("show", true, "If true, print out the file downloaded.")
-	tar           = flag.Bool("tar", false, "If true, download the tar version for Windows and MacOS.")
+	archive       = flag.Bool("archive", false, "If true, download the zip/tar version for Windows and MacOS.")
 )
 
 func main() {
@@ -61,13 +61,13 @@ func main() {
 	case "freebsd":
 		gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
 	case "windows":
-		if *tar {
-			gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
+		if *archive {
+			gofile = fmt.Sprintf("%v.%v-%v.zip", version, goos, arch)
 		} else {
 			gofile = fmt.Sprintf("%v.%v-%v.msi", version, goos, arch)
 		}
 	case "darwin":
-		if *tar {
+		if *archive {
 			gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
 		} else {
 			gofile = fmt.Sprintf("%v.%v-%v.pkg", version, goos, arch)
