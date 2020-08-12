@@ -55,11 +55,11 @@ func main() {
 	var gofile string
 
 	// Construct the file name for the stable binary.
+	gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
+
 	switch goos {
 	case "linux":
-		gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
 	case "freebsd":
-		gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
 	case "windows":
 		if *archive {
 			gofile = fmt.Sprintf("%v.%v-%v.zip", version, goos, arch)
@@ -67,9 +67,7 @@ func main() {
 			gofile = fmt.Sprintf("%v.%v-%v.msi", version, goos, arch)
 		}
 	case "darwin":
-		if *archive {
-			gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
-		} else {
+		if !*archive {
 			gofile = fmt.Sprintf("%v.%v-%v.pkg", version, goos, arch)
 		}
 	default:
