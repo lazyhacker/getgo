@@ -74,6 +74,10 @@ func main() {
 		log.Fatalln("Unknown OS... can't download.")
 	}
 
+	if *show {
+		fmt.Printf("%v\n", filepath)
+	}
+
 	// Get the checksum value from the checksum file.
 	resp, err = http.Get(fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, gofile+sha_extension))
 	if err != nil {
@@ -122,9 +126,6 @@ func main() {
 		os.Remove(filepath)
 	}
 
-	if *show {
-		fmt.Printf("%v\n", filepath)
-	}
 }
 
 func checksumMatch(f, v string) (bool, string) {
