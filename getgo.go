@@ -75,7 +75,7 @@ func main() {
 	}
 
 	if *show {
-		fmt.Printf("%v\n", filepath)
+		fmt.Printf("%v\n", gofile)
 	}
 
 	// Get the checksum value from the checksum file.
