@@ -18,7 +18,8 @@ your choice (or current directory if unspecified).
 
 ### If no version of Go is available locally:
 
-Pre-built binaries for Linux is available in the releases section in case there is no version of Go already installed.
+Pre-built binaries for Linux is available in the releases section in case there
+is no version of Go already installed.
 
 ## Usage
 
@@ -28,4 +29,6 @@ To get help info:
 To download to a specific directory:
 `getgo -dir ~/Downloads`
 
-
+NOTE: getgo checks https://golang.org/VERSION?m=text to determine the latest
+stable version of Go, but there sometimes is a delay when it gets updated and
+when the latest version of Go is released on http://golang.org.
