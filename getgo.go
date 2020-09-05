@@ -6,6 +6,7 @@ package main // import "lazyhacker.dev/getgo"
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -17,8 +18,8 @@ import (
 )
 
 const (
-	STABLE_VERSION  = "https://golang.org/VERSION?m=text"
-	GO_DOWNLOAD_URL = "https://dl.google.com/go"
+	STABLE_VERSION  = "https://golang.org/dl/?mode=json"
+	GO_DOWNLOAD_URL = "https://golang.org/dl" // redicts to https://dl.google.com/go
 )
 
 var (
@@ -29,6 +30,20 @@ var (
 	archive       = flag.Bool("archive", false, "If true, download the zip/tar version for Windows and MacOS.")
 )
 
+type goFilesStruct struct {
+	Version string `json:"version"`
+	Stable  bool   `json:"stable"`
+	Files   []struct {
+		Filename string `json:"filename"`
+		Os       string `json:"os"`
+		Arch     string `json:"arch"`
+		Version  string `json:"version"`
+		Sha256   string `json:"sha256"`
+		Size     int    `json:"size"`
+		Kind     string `json:"kind"`
+	} `json:"files"`
+}
+
 func main() {
 
 	flag.Parse()
@@ -36,96 +51,93 @@ func main() {
 	goos := runtime.GOOS
 	arch := runtime.GOARCH
 
-	resp, err := http.Get(STABLE_VERSION)
+	var gfs []goFilesStruct
+	var max *goFilesStruct
+
 	if version == "" {
+
+		resp, err := http.Get(STABLE_VERSION)
 		if err != nil {
 			log.Fatalf("Unable to get the latest version number. %v", err)
 		}
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatalf("Unable to read the version number. %v", err)
+			log.Fatalf("Unable to read the body of the response. %v", err)
 		}
-		version = string(body)
+		jserr := json.Unmarshal(body, &gfs)
+		if jserr != nil {
+			log.Fatalf("Unable to unmarshal response body. %v", jserr)
+		}
+
+		for i, v := range gfs {
+			if !v.Stable {
+				continue
+			}
+			if max == nil {
+				max = &gfs[i]
+			}
+			if v.Version > max.Version {
+				max = &gfs[i]
+			}
+		}
+	}
+
+	if max == nil {
+		log.Fatal("Unable to find a stable version!")
 	}
 
 	if arch == "arm" {
 		arch = "armv6l"
 	}
-	var gofile string
 
-	// Construct the file name for the stable binary.
-	gofile = fmt.Sprintf("%v.%v-%v.tar.gz", version, goos, arch)
+	for i, v := range max.Files {
+		if v.Os == goos && v.Arch == arch {
+			if *show {
+				fmt.Printf("%v\n", v.Filename)
+			}
+			// Check if the binary has already been downloaded.
+			var filepath string
+			if *dl != "" {
+				filepath = *dl + string(os.PathSeparator) + v.Filename
+			} else {
+				filepath = v.Filename
+			}
+			if _, err := os.Stat(filepath); err == nil {
+				if m, _ := checksumMatch(filepath, v.Sha256); m {
+					log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
+					return
+				}
+			}
 
-	switch goos {
-	case "linux":
-	case "freebsd":
-	case "windows":
-		if *archive {
-			gofile = fmt.Sprintf("%v.%v-%v.zip", version, goos, arch)
-		} else {
-			gofile = fmt.Sprintf("%v.%v-%v.msi", version, goos, arch)
+			// Download the golang binary
+			download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, v.Filename)
+			out, err := os.Create(filepath)
+			if err != nil {
+				log.Fatalf("Unable to create %v locally. %v", filepath, err)
+			}
+			defer out.Close()
+
+			resp, err := http.Get(download)
+			if err != nil {
+				log.Fatalf("Unable to fetch the binary %v. %v", download, err)
+			}
+			_, err = io.Copy(out, resp.Body)
+			if err != nil {
+				log.Fatalf("Unable to write %v. %v", filepath, err)
+			}
+
+			// Compute the checksum
+			if m, sum := checksumMatch(filepath, v.Sha256); !m {
+				log.Printf("Calculated checksum %v != %v. Removing download.\n", sum, v.Sha256)
+				os.Remove(filepath)
+			}
+			break
 		}
-	case "darwin":
-		if !*archive {
-			gofile = fmt.Sprintf("%v.%v-%v.pkg", version, goos, arch)
-		}
-	default:
-		log.Fatalln("Unknown OS... can't download.")
-	}
-
-	if *show {
-		fmt.Printf("%v\n", gofile)
-	}
-
-	// Get the checksum value from the checksum file.
-	resp, err = http.Get(fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, gofile+sha_extension))
-	if err != nil {
-		log.Fatalf("Unable to download sha256 file for %v. %v", gofile, err)
-	}
-	c, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Unable to read the checksum from file. %v", err)
-	}
-	sha256content := string(c)
-
-	// Check if the binary has already been downloaded.
-	var filepath string
-	if *dl != "" {
-		filepath = *dl + string(os.PathSeparator) + gofile
-	} else {
-		filepath = gofile
-	}
-	if _, err := os.Stat(filepath); err == nil {
-		if m, _ := checksumMatch(filepath, sha256content); m {
-			log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
-			return
+		if i == len(max.Files)-1 {
+			log.Fatal("Unable to find any files to download.")
 		}
 	}
-
-	// Download the golang binary
-	download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, gofile)
-	out, err := os.Create(filepath)
-	if err != nil {
-		log.Fatalf("Unable to create %v locally. %v", gofile, err)
-	}
-	defer out.Close()
-
-	resp, err = http.Get(download)
-	if err != nil {
-		log.Fatalf("Unable to get the latest version number. %v", err)
-	}
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		log.Fatalf("Unable to download %v. %v", gofile, err)
-	}
-
-	// Compute the checksum
-	if m, v := checksumMatch(filepath, sha256content); !m {
-		log.Printf("Calcuated checksum %v != %v. Removing download.\n", v, sha256content)
-		os.Remove(filepath)
-	}
-
 }
 
 func checksumMatch(f, v string) (bool, string) {

@@ -29,6 +29,5 @@ To get help info:
 To download to a specific directory:
 `getgo -dir ~/Downloads`
 
-NOTE: getgo checks https://golang.org/VERSION?m=text to determine the latest
-stable version of Go, but there sometimes is a delay when it gets updated and
-when the latest version of Go is released on http://golang.org.
+NOTE: getgo checks https://golang.org/dl/?mode=json to determine the latest
+stable version of Go.
