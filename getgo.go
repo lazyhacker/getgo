@@ -27,7 +27,7 @@ var (
 	dl            = flag.String("dir", "", "Directory path to download to.")
 	version       = *flag.String("version", "", "Specific version to download (e.g. 1.14.7)")
 	show          = flag.Bool("show", true, "If true, print out the file downloaded.")
-	archive       = flag.Bool("archive", false, "If true, download the zip/tar version for Windows and MacOS.")
+	kind          = flag.String("kind", "archive", "What kind of file to download (archive, installer).")
 )
 
 type goFilesStruct struct {
@@ -92,7 +92,7 @@ func main() {
 	}
 
 	for i, v := range max.Files {
-		if v.Os == goos && v.Arch == arch {
+		if v.Os == goos && v.Arch == arch && v.Kind == *kind {
 			if *show {
 				fmt.Printf("%v\n", v.Filename)
 			}
