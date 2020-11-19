@@ -19,7 +19,7 @@ import (
 
 const (
 	STABLE_VERSION  = "https://golang.org/dl/?mode=json"
-	GO_DOWNLOAD_URL = "https://golang.org/dl" // redicts to https://dl.google.com/go
+	GO_DOWNLOAD_URL = "https://golang.org/dl" // redirects to https://dl.google.com/go
 )
 
 var (
@@ -28,8 +28,11 @@ var (
 	version       = *flag.String("version", "", "Specific version to download (e.g. 1.14.7)")
 	show          = flag.Bool("show", true, "If true, print out the file downloaded.")
 	kind          = flag.String("kind", "archive", "What kind of file to download (archive, installer).")
+	goos          = runtime.GOOS
+	arch          = runtime.GOARCH
 )
 
+// goFilesStruct maps to the JSON format from STABLE_VERSION.
 type goFilesStruct struct {
 	Version string `json:"version"`
 	Stable  bool   `json:"stable"`
@@ -44,30 +47,112 @@ type goFilesStruct struct {
 	} `json:"files"`
 }
 
+func init() {
+
+	// For ARM architecture, use v6l for Raspberry Pi.init
+	if arch == "arm" {
+		arch = "armv6l"
+	}
+
+}
+
 func main() {
 
 	flag.Parse()
-	// Get the OS and architecture
-	goos := runtime.GOOS
-	arch := runtime.GOARCH
+
+	stable, err := latestVersion()
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	f, _, err := downloadAndVerify(stable)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	if *show {
+		fmt.Printf("%v\n", f)
+	}
+}
+
+// downloadAndVerify downloads the Go binary that is passed in and verify
+// it against its sha256 checksum.  If there is already a local file
+// that matches the checksum then it will not download another version.
+func downloadAndVerify(gfs *goFilesStruct) (filename string, sum string, err error) {
+
+	var filepath string
+	var sumMatch bool
+
+	for i, v := range gfs.Files {
+		if v.Os == goos && v.Arch == arch && v.Kind == *kind {
+			// Check if the binary has already been downloaded.
+			if *dl != "" {
+				filepath = *dl + string(os.PathSeparator) + v.Filename
+			} else {
+				filepath = v.Filename
+			}
+
+			if _, err := os.Stat(filepath); err == nil {
+				sumMatch, sum = checksumMatch(filepath, v.Sha256)
+				if sumMatch {
+					log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
+					return v.Filename, sum, nil
+				}
+			}
+
+			// Download the golang binary
+			download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, v.Filename)
+			out, err := os.Create(filepath)
+			if err != nil {
+				return "", "", fmt.Errorf("unable to create %v locally. %v", filepath, err)
+			}
+			defer out.Close()
+
+			resp, err := http.Get(download)
+			if err != nil {
+				return "", "", fmt.Errorf("unable to fetch the binary %v. %v", download, err)
+			}
+			_, err = io.Copy(out, resp.Body)
+			if err != nil {
+				return "", "", fmt.Errorf("unable to write %v. %v", filepath, err)
+			}
+
+			// Compute the checksum
+			if !sumMatch {
+				log.Printf("Calculated checksum %v != %v. Removing download.\n", sum, v.Sha256)
+				os.Remove(filepath)
+			}
+			return v.Filename, sum, nil
+		}
+		if i == len(gfs.Files)-1 {
+			return "", "", fmt.Errorf("Unable to find any files to download.")
+		}
+	}
+
+	return "", "", nil
+}
+
+// latestVersion returns the highest named version that is marked stable.
+func latestVersion() (*goFilesStruct, error) {
 
 	var gfs []goFilesStruct
 	var max *goFilesStruct
 
 	if version == "" {
-
 		resp, err := http.Get(STABLE_VERSION)
 		if err != nil {
-			log.Fatalf("Unable to get the latest version number. %v", err)
+			return nil, fmt.Errorf("unable to get the latest version number. %v", err)
 		}
+
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			log.Fatalf("Unable to read the body of the response. %v", err)
+			return nil, fmt.Errorf("unable to read the body of the response. %v", err)
 		}
+
 		jserr := json.Unmarshal(body, &gfs)
 		if jserr != nil {
-			log.Fatalf("Unable to unmarshal response body. %v", jserr)
+			return nil, fmt.Errorf("unable to unmarshal response body. %v", jserr)
 		}
 
 		for i, v := range gfs {
@@ -83,61 +168,9 @@ func main() {
 		}
 	}
 
-	if max == nil {
-		log.Fatal("Unable to find a stable version!")
-	}
+	log.Printf("Latest stable version is %v.\n", max.Version)
 
-	if arch == "arm" {
-		arch = "armv6l"
-	}
-
-	for i, v := range max.Files {
-		if v.Os == goos && v.Arch == arch && v.Kind == *kind {
-			if *show {
-				fmt.Printf("%v\n", v.Filename)
-			}
-			// Check if the binary has already been downloaded.
-			var filepath string
-			if *dl != "" {
-				filepath = *dl + string(os.PathSeparator) + v.Filename
-			} else {
-				filepath = v.Filename
-			}
-			if _, err := os.Stat(filepath); err == nil {
-				if m, _ := checksumMatch(filepath, v.Sha256); m {
-					log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
-					return
-				}
-			}
-
-			// Download the golang binary
-			download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, v.Filename)
-			out, err := os.Create(filepath)
-			if err != nil {
-				log.Fatalf("Unable to create %v locally. %v", filepath, err)
-			}
-			defer out.Close()
-
-			resp, err := http.Get(download)
-			if err != nil {
-				log.Fatalf("Unable to fetch the binary %v. %v", download, err)
-			}
-			_, err = io.Copy(out, resp.Body)
-			if err != nil {
-				log.Fatalf("Unable to write %v. %v", filepath, err)
-			}
-
-			// Compute the checksum
-			if m, sum := checksumMatch(filepath, v.Sha256); !m {
-				log.Printf("Calculated checksum %v != %v. Removing download.\n", sum, v.Sha256)
-				os.Remove(filepath)
-			}
-			break
-		}
-		if i == len(max.Files)-1 {
-			log.Fatal("Unable to find any files to download.")
-		}
-	}
+	return max, nil
 }
 
 func checksumMatch(f, v string) (bool, string) {
