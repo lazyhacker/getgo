@@ -19,8 +19,14 @@ your choice (or current directory if unspecified).
 
 `go get lazyhacker.dev/getgo` (command line only)
 
-`go get lazyhacker.dev/getgo -tags gui` (GUI version but requires Fyne to be
-installed)
+
+To try the experimental GUI:
+
+```
+go get lazyhacker.dev/getgo
+go build -tags gui
+getgo --gui
+```
 
 ### If no version of Go is available locally:
 
