@@ -1,7 +1,7 @@
-A simple program to download the latest stable version of Go
-(http:golang.org) and verifies that the downloaded file matches the checksum.
+A simple program to download the latest stable version of [Go](https://golang.org)
+and verifies that it matches the checksum.
 
-It is primarily an command line tool with an experimental GUI mode that is only
+It is primarily a command line tool with an experimental GUI mode that is only
 half-baked.
 
 It is written to as a convenience tool so that you don't have to go to the web
@@ -24,7 +24,7 @@ To try the experimental GUI:
 
 ```
 go get lazyhacker.dev/getgo
-go build -tags gui
+go build lazyhacker.dev/getgo -tags gui
 getgo --gui
 ```
 
