@@ -1,5 +1,8 @@
-A simple command line program to download the latest stable version of Go
+A simple program to download the latest stable version of Go
 (http:golang.org) and verifies that the downloaded file matches the checksum.
+
+It is primarily an command line tool with an experimental GUI mode that is only
+half-baked.
 
 It is written to as a convenience tool so that you don't have to go to the web
 site, find and download the correct binary for your platform, download the
@@ -14,7 +17,10 @@ your choice (or current directory if unspecified).
 
 ### If a version of Go is already installed:
 
-`go get lazyhacker.dev/getgo`
+`go get lazyhacker.dev/getgo` (command line only)
+
+`go get lazyhacker.dev/getgo -tags gui` (GUI version but requires Fyne to be
+installed)
 
 ### If no version of Go is available locally:
 
