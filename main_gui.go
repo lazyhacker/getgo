@@ -16,6 +16,11 @@ import (
 )
 
 var (
+	dl      = flag.String("dir", "", "Directory path to download to.")
+	version = *flag.String("version", "", "Specific version to download (e.g. 1.14.7)")
+	show    = flag.Bool("show", true, "If true, print out the file downloaded.")
+	kind    = flag.String("kind", "archive", "What kind of file to download (archive, installer).")
+
 	win = flag.Bool("gui", false, "Run with a GUI.")
 )
 
