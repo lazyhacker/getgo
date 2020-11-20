@@ -21,7 +21,7 @@ func main() {
 		log.Fatalf("%v", err)
 	}
 
-	err = DownloadAndVerify(stable, checksum)
+	err = DownloadAndVerify(*dl, stable, checksum)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

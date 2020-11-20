@@ -28,7 +28,7 @@ func main() {
 	if *win {
 		LoadGUI(stable, checksum)
 	} else {
-		err := DownloadAndVerify(stable, checksum)
+		err := DownloadAndVerify(*dl, stable, checksum)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}

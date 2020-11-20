@@ -29,13 +29,13 @@ type goFilesStruct struct {
 // DownloadAndVerify downloads the Go binary that is passed in and verify
 // it against its sha256 checksum.  If there is already a local file
 // that matches the checksum then it will not download another version.
-func DownloadAndVerify(filename, checksum string) error {
+func DownloadAndVerify(destdir, filename, checksum string) error {
 
 	var filepath, calcSum string
 	var sumMatch bool
 
-	if *dl != "" {
-		filepath = *dl + string(os.PathSeparator) + filename
+	if destdir != "" {
+		filepath = destdir + string(os.PathSeparator) + filename
 	} else {
 		filepath = filename
 	}

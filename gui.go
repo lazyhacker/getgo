@@ -40,7 +40,7 @@ func LoadGUI(filename, checksum string) {
 			func() {
 				prog := dialog.NewProgressInfinite("Downloading", fileValue.Text, w)
 				prog.Show()
-				err := DownloadAndVerify(filename, checksum)
+				err := DownloadAndVerify(dirValue.Text, filename, checksum)
 				prog.Hide()
 				if err != nil {
 					dialog.ShowError(err, w)
