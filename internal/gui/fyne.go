@@ -1,6 +1,6 @@
 // +build gui
 
-package main
+package gui
 
 import (
 	"image/color"
@@ -13,6 +13,8 @@ import (
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 	"golang.org/x/image/colornames"
+
+	"lazyhacker.dev/getgo/internal/lib"
 )
 
 func LoadGUI(filename, checksum string) {
@@ -40,7 +42,7 @@ func LoadGUI(filename, checksum string) {
 			func() {
 				prog := dialog.NewProgressInfinite("Downloading", fileValue.Text, w)
 				prog.Show()
-				err := DownloadAndVerify(dirValue.Text, filename, checksum)
+				err := lib.DownloadAndVerify(dirValue.Text, filename, checksum)
 				prog.Hide()
 				if err != nil {
 					dialog.ShowError(err, w)

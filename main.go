@@ -10,18 +10,20 @@ import (
 	"flag"
 	"fmt"
 	"log"
+
+	"lazyhacker.dev/getgo/internal/lib"
 )
 
 func main() {
 
 	flag.Parse()
 
-	stable, checksum, err := LatestVersion()
+	stable, checksum, err := lib.LatestVersion(*kind)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	err = DownloadAndVerify(*dl, stable, checksum)
+	err = lib.DownloadAndVerify(*dl, stable, checksum)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

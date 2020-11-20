@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"crypto/sha256"
@@ -9,6 +9,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
+)
+
+const (
+	STABLE_VERSION  = "https://golang.org/dl/?mode=json"
+	GO_DOWNLOAD_URL = "https://golang.org/dl" // redirects to https://dl.google.com/go
+)
+
+var (
+	goos = runtime.GOOS
+	arch = runtime.GOARCH
 )
 
 // goFilesStruct maps to the JSON format from STABLE_VERSION.
@@ -24,6 +35,15 @@ type goFilesStruct struct {
 		Size     int    `json:"size"`
 		Kind     string `json:"kind"`
 	} `json:"files"`
+}
+
+func init() {
+
+	// For ARM architecture, use v6l for Raspberry Pi.
+	if arch == "arm" {
+		arch = "armv6l"
+	}
+
 }
 
 // DownloadAndVerify downloads the Go binary that is passed in and verify
@@ -77,49 +97,47 @@ func DownloadAndVerify(destdir, filename, checksum string) error {
 }
 
 // LatestVersion returns the highest stable versions for the platform.
-func LatestVersion() (filename string, sha256sum string, err error) {
+func LatestVersion(kind string) (filename string, sha256sum string, err error) {
 
 	var gfs []goFilesStruct
 	var max *goFilesStruct
 
-	if version == "" {
-		resp, err := http.Get(STABLE_VERSION)
-		if err != nil {
-			return "", "", fmt.Errorf("unable to get the latest version number. %v", err)
-		}
+	resp, err := http.Get(STABLE_VERSION)
+	if err != nil {
+		return "", "", fmt.Errorf("unable to get the latest version number. %v", err)
+	}
 
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", "", fmt.Errorf("unable to read the body of the response. %v", err)
-		}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", fmt.Errorf("unable to read the body of the response. %v", err)
+	}
 
-		jserr := json.Unmarshal(body, &gfs)
-		if jserr != nil {
-			return "", "", fmt.Errorf("unable to unmarshal response body. %v", jserr)
-		}
+	jserr := json.Unmarshal(body, &gfs)
+	if jserr != nil {
+		return "", "", fmt.Errorf("unable to unmarshal response body. %v", jserr)
+	}
 
-		for i, v := range gfs {
-			if !v.Stable {
-				continue
-			}
-			if max == nil {
-				max = &gfs[i]
-			}
-			if v.Version > max.Version {
-				max = &gfs[i]
-			}
+	for i, v := range gfs {
+		if !v.Stable {
+			continue
+		}
+		if max == nil {
+			max = &gfs[i]
+		}
+		if v.Version > max.Version {
+			max = &gfs[i]
 		}
 	}
 
 	log.Printf("Latest stable version is %v.\n", max.Version)
 
 	for _, v := range max.Files {
-		if v.Os == goos && v.Arch == arch && v.Kind == *kind {
+		if v.Os == goos && v.Arch == arch && v.Kind == kind {
 			return v.Filename, v.Sha256, nil
 		}
 	}
-	return "", "", fmt.Errorf("No download found for OS=%v ARCH=%v KIND=%v.", goos, arch, *kind)
+	return "", "", fmt.Errorf("No download found for OS=%v ARCH=%v KIND=%v.", goos, arch, kind)
 }
 
 func checksumMatch(f, v string) (bool, string) {
