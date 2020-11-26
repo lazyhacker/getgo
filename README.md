@@ -44,11 +44,10 @@ stable version of Go.
 I'm experimenting and comparing different front-end frameworks starting with
 [Fyne](https://fyne.io) and [GTK3](https://github.com/gotk3/gotk3).  To avoid
 requiring users from having to install the different frameworks that they might
-not to have on their system, I'm using build tags to control what gets compiled.
-While the `go get` command above will pull all the Go source, it's not necessary
-to install the GUI frameworks.
+not to have on their system to compile a version, I'm using build tags to
+control what gets compiled.
 
-To try the Fyne version:
+To try the Fyne version (require installing Fyne and its dependencies):
 
 ```
 go get lazyhacker.dev/getgo
@@ -56,7 +55,7 @@ go run -tags gui,fyne lazyhacker.dev/getgo --gui
 
 ```
 
-To try the GTK3 version:
+To try the GTK3 version (requires installing the GTK3 development libraries):
 
 ```
 go get lazyhacker.dev/getgo
