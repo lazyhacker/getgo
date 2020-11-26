@@ -1,6 +1,6 @@
-// +build gui
+// +build gui,fyne
 
-package gui
+package guimain
 
 import (
 	"image/color"

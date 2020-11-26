@@ -15,27 +15,22 @@ your choice (or current directory if unspecified).
 
 ## Install
 
-### If a version of Go is already installed:
+### Pre-built Binaries
 
-`go get lazyhacker.dev/getgo` (command line only)
+Pre-built binaries are available in the releases section.
+
+### Compile From Source
+
+To compile from the source, use the normal Go command:
+
+`go get lazyhacker.dev/getgo`
 
 
-To try the experimental GUI:
-
-```
-go get lazyhacker.dev/getgo
-go build lazyhacker.dev/getgo -tags gui
-getgo --gui
-```
-
-### If no version of Go is available locally:
-
-Pre-built binaries for Linux is available in the releases section in case there
-is no version of Go already installed.
 
 ## Usage
 
 To get help info:
+
 `getgo -help`
 
 To download to a specific directory:
@@ -43,3 +38,29 @@ To download to a specific directory:
 
 NOTE: getgo checks https://golang.org/dl/?mode=json to determine the latest
 stable version of Go.
+
+## Experimental GUI version
+
+I'm experimenting and comparing different front-end frameworks starting with
+[Fyne](https://fyne.io) and [GTK3](https://github.com/gotk3/gotk3).  To avoid
+requiring users from having to install the different frameworks that they might
+not to have on their system, I'm using build tags to control what gets compiled.
+While the `go get` command above will pull all the Go source, it's not necessary
+to install the GUI frameworks.
+
+To try the Fyne version:
+
+```
+go get lazyhacker.dev/getgo
+go run -tags gui,fyne lazyhacker.dev/getgo --gui
+
+```
+
+To try the GTK3 version:
+
+```
+go get lazyhacker.dev/getgo
+go run -tags gui,gtk3 lazyhacker.dev/getgo --gui
+
+```
+
