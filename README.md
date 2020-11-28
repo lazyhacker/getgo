@@ -1,17 +1,12 @@
-A simple program to download the latest stable version of [Go](https://golang.org)
-and verifies that it matches the checksum.
+getgo checks https://golang.org/dl/?mode=json to determine the latest
+stable version of [Go](https://golang.org) to download and verifies its
+checksum.  The tool won't download the binary if a verified one already exists
+locally.
 
-It is primarily a command line tool with an experimental GUI mode that is only
+It is command line utility with an experimental GUI mode that is only
 half-baked.
 
-It is written to as a convenience tool so that you don't have to go to the web
-site, find and download the correct binary for your platform, download the
-checksum and then verify it yourself.
-
-The tool won't re-download the binary if a verified one already exists locally.
-
-The tool will not install the binary.  It only downloads it to the directory of
-your choice (or current directory if unspecified).
+![animemated screenshot](getgo.gif)
 
 ## Install
 
@@ -25,19 +20,16 @@ To compile from the source, use the normal Go command:
 
 `go get lazyhacker.dev/getgo`
 
-
-
 ## Usage
 
-To get help info:
-
-`getgo -help`
+Just run `getgo`.
 
 To download to a specific directory:
 `getgo -dir ~/Downloads`
 
-NOTE: getgo checks https://golang.org/dl/?mode=json to determine the latest
-stable version of Go.
+To get help info:
+
+`getgo -help`
 
 ## Experimental GUI version
 

@@ -70,6 +70,7 @@ func DownloadAndVerify(destdir, filename, checksum string) error {
 	}
 
 	// Download the golang binary
+	log.Println("Beginning download.")
 	download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, filename)
 	out, err := os.Create(filepath)
 	if err != nil {
@@ -85,6 +86,7 @@ func DownloadAndVerify(destdir, filename, checksum string) error {
 		return fmt.Errorf("unable to write %v. %v", filepath, err)
 	}
 
+	log.Println("Download complete!  Verifying checksum...")
 	// Compute and verify the checksum of the downloaded file.
 	sumMatch, calcSum = checksumMatch(filepath, checksum)
 	if !sumMatch {
@@ -102,6 +104,7 @@ func LatestVersion(kind string) (filename string, sha256sum string, err error) {
 	var gfs []goFilesStruct
 	var max *goFilesStruct
 
+	log.Println("Checking for the latest stable version.")
 	resp, err := http.Get(STABLE_VERSION)
 	if err != nil {
 		return "", "", fmt.Errorf("unable to get the latest version number. %v", err)
