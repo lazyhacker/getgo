@@ -54,11 +54,15 @@ func LoadGUI(filename, checksum string) {
 
 	downloadBtn.Connect("clicked", func() {
 
+		// Set a timer function that periodically updates the progress bar.
 		h, err := glib.TimeoutAdd(1000, updateProgress, downloadProgress)
 		if err != nil {
 			log.Printf("Error with timeline: %v", err)
 		}
 
+		// Have a go routine handle the download so the UI doesn't get blocked
+		// waiting for the download to complete before the showing the progress
+		// bar.
 		done := make(chan int)
 		go func() {
 			if err := lib.DownloadAndVerify(wd, filename, checksum); err != nil {
@@ -70,6 +74,8 @@ func LoadGUI(filename, checksum string) {
 		}()
 
 	FS:
+		// Listen for the goroutine to tell us that the download is completed.
+		// While waiting, don't block the UI so pass control back to GTK.
 		for {
 			select {
 			case <-done:
@@ -85,7 +91,6 @@ func LoadGUI(filename, checksum string) {
 		dialog := gtk.MessageDialogNew(win, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE, "Complete!")
 		defer dialog.Destroy()
 		dialog.Run()
-
 	})
 
 	grid, err := gtk.GridNew()
