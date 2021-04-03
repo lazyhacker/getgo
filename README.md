@@ -54,6 +54,23 @@ To get help info:
 
 `getgo -help`
 
+### Full Example
+
+I use getgo make it easier for me to upgrade Go when a new release comes out.
+The steps are generally:
+
+1. Download Go from golang.org.
+1. Verify the download.
+1. Delete /usr/local/go.
+1. Untar the downloaded .tar.gz file to /usr/local
+
+With getgo, this will do the above:
+
+```
+sudo rm /usr/local/go
+sudo getgo -x /usr/local
+```
+
 ## Experimental GUI version
 
 I'm experimenting and comparing different front-end frameworks starting with
