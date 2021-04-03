@@ -12,20 +12,43 @@ half-baked.
 
 ### Pre-built Binaries
 
-Pre-built binaries are available in the releases section.
-
-### Compile From Source
-
-To compile from the source, use the normal Go command:
+Pre-built binaries are available in the releases section or it can be built if
+you already have Go installed:
 
 `go get lazyhacker.dev/getgo`
 
+### Compile From Source
+
+If you've downloaded the source then the standard Go tool for building can be
+used:
+
+```
+go build main.go
+```
+
 ## Usage
 
-Just run `getgo`.
+Just run `getgo` to download the most recent stable archive for the platform it
+is running from.  To also extract the archive run it with the '-x' flag:
+
+```
+getgo -x <dir to extract to>
+```
+On Windows, getgo can be told to download the installer with
+
+```
+getgo -kind installer
+```
 
 To download to a specific directory:
+
 `getgo -dir ~/Downloads`
+
+To download another OS and/or arch version, use the '-os' and the '-arch' flags:
+
+```
+getgo -os windows -arch amd64
+```
 
 To get help info:
 
