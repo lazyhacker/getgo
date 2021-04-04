@@ -14,7 +14,7 @@ func main() {
 
 	flag.Parse()
 
-	stable, checksum, err := lib.LatestVersion(*kind)
+	stable, checksum, err := lib.LatestVersion("windows", "amd64", "installer")
 	if err != nil {
 		log.Fatalf("%v", err)
 	}

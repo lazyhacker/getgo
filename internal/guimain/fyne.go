@@ -6,12 +6,12 @@ import (
 	"image/color"
 	"os"
 
-	"fyne.io/fyne"
-	"fyne.io/fyne/app"
-	"fyne.io/fyne/canvas"
-	"fyne.io/fyne/dialog"
-	"fyne.io/fyne/layout"
-	"fyne.io/fyne/widget"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	"golang.org/x/image/colornames"
 
 	"lazyhacker.dev/getgo/internal/lib"
@@ -42,7 +42,7 @@ func LoadGUI(filename, checksum string) {
 			func() {
 				prog := dialog.NewProgressInfinite("Downloading", fileValue.Text, w)
 				prog.Show()
-				err := lib.DownloadAndVerify(dirValue.Text, filename, checksum)
+				err := lib.DownloadAndVerify(dirValue.Text, filename, checksum, "")
 				prog.Hide()
 				if err != nil {
 					dialog.ShowError(err, w)
