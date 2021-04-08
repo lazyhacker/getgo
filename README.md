@@ -73,6 +73,9 @@ sudo getgo -x /usr/local
 
 ## Experimental GUI version
 
+![gui screenshot](getgo-gui.png)
+
+
 I'm experimenting and comparing different front-end frameworks starting with
 [Fyne](https://fyne.io) and [GTK3](https://github.com/gotk3/gotk3).  To avoid
 requiring users from having to install the different frameworks that they might
