@@ -20,6 +20,11 @@ const (
 	GO_DOWNLOAD_URL = "https://golang.org/dl" // redirects to https://dl.google.com/go
 )
 
+var (
+	OperatingSystems = []string{"aix", "darwin", "dragonfly", "freebsd", "illumos", "js", "linux", "netbsd", "openbsd", "plan9", "solaris", "windows"}
+	Architectures    = []string{"386", "amd64", "arm", "arm64", "ppc64", "ppc64le", "mips", "mips64", "mips64le", "riscv64", "s390x", "wasm"}
+)
+
 // goFilesStruct maps to the JSON format from STABLE_VERSION.
 type goFilesStruct struct {
 	Version string `json:"version"`

@@ -83,15 +83,17 @@ To try the Fyne version (require installing Fyne and its dependencies):
 
 ```
 go get lazyhacker.dev/getgo
-go run -tags gui,fyne lazyhacker.dev/getgo --gui
+go run -tags gui,fyne lazyhacker.dev/getgo
 
 ```
+
+** There is a problem with gotk3 and Go 1.16 **
 
 To try the GTK3 version (requires installing the GTK3 development libraries):
 
 ```
 go get lazyhacker.dev/getgo
-go run -tags gui,gtk3 lazyhacker.dev/getgo --gui
+go run -tags gui,gtk3 lazyhacker.dev/getgo
 
 ```
 
