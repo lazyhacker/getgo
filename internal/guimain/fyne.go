@@ -116,11 +116,13 @@ func (a *GetGo) Init(w fyne.Window) {
 		func() {
 			dialog.ShowFolderOpen(
 				func(uri fyne.ListableURI, err error) {
+					if uri == nil || err != nil {
+						return
+					}
 					// TODO: Should look into data binding for these fields.
 					a.savepath = uri.Path()
 					a.lblSavePath.SetText(uri.Path())
-				}, a.parent)
-
+				}, w)
 		},
 	)
 
@@ -152,6 +154,7 @@ app, create a window, set the container and start the app.
 func LoadGUI() {
 	a := app.New()
 	w := a.NewWindow("GetGo")
+	w.Resize(fyne.Size{Width: 680, Height: 280})
 
 	ui := GetGo{}
 	ui.Init(w)
