@@ -116,11 +116,13 @@ func (a *GetGo) Init(w fyne.Window) {
 		func() {
 			dialog.ShowFolderOpen(
 				func(uri fyne.ListableURI, err error) {
+					if uri == nil || err != nil {
+						return
+					}
 					// TODO: Should look into data binding for these fields.
 					a.savepath = uri.Path()
 					a.lblSavePath.SetText(uri.Path())
-				}, a.parent)
-
+				}, w)
 		},
 	)
 
