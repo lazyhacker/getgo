@@ -76,27 +76,14 @@ sudo getgo -x /usr/local
 ![gui screenshot](getgo-gui.png)
 
 
-I'm experimenting and comparing different front-end frameworks starting with
-[Fyne](https://fyne.io) and [GTK3](https://github.com/gotk3/gotk3).  To avoid
-requiring users from having to install the different frameworks that they might
-not to have on their system to compile a version, I'm using build tags to
-control what gets compiled.
+I'm experimenting with building GUI apps with Go.  [Fyne](https://fyne.io) is a
+cross-platform Go GUI toolkit that I started testing.
 
-To try the Fyne version (require installing Fyne and its dependencies):
+To try the Fyne version (require [installing Fyne](https://developer.fyne.io/#installing)
+and its [dependencies](https://developer.fyne.io/started/#prerequisites)):
 
 ```
 go get lazyhacker.dev/getgo
-go run -tags gui,fyne lazyhacker.dev/getgo
+go run -tags gui lazyhacker.dev/getgo
 
 ```
-
-** There is a problem with gotk3 and Go 1.16 **
-
-To try the GTK3 version (requires installing the GTK3 development libraries):
-
-```
-go get lazyhacker.dev/getgo
-go run -tags gui,gtk3 lazyhacker.dev/getgo
-
-```
-

@@ -1,4 +1,4 @@
-// +build gui,fyne
+// +build gui
 
 package guimain
 
