@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	STABLE_VERSION  = "https://golang.org/dl/?mode=json"
-	GO_DOWNLOAD_URL = "https://golang.org/dl" // redirects to https://dl.google.com/go
+	STABLE_VERSION  = "https://go.dev/dl/?mode=json"
+	GO_DOWNLOAD_URL = "https://go.dev/dl" // redirects to https://dl.google.com/go
 )
 
 var (
