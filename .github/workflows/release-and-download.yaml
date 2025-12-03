@@ -53,13 +53,13 @@ jobs:
           DATE=$(date +'%Y-%m-%dT%H:%M:%SZ')
 
           # FIX 2: Define the filename variable so we can use it for the checksum
-          FILENAME="myapp-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}"
+          FILENAME="getgo-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}"
           
           # 3. Build with -ldflags to inject variables
           mkdir -p build
           go build -v \
             -ldflags "-X 'main.build=$VERSION' -X 'main.commit=$COMMIT' -X 'main.build-date=$DATE'" \
-            -o build/$FILENAME ./...
+            -o build/$FILENAME .
 
           # Generate SHA256 Checksum
           cd build
