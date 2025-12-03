@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-    name: Build binaries
     runs-on: ubuntu-latest
     strategy:
       matrix:
