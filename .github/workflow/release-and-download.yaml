@@ -1,0 +1,83 @@
+name: Build & Release Binaries
+
+on:
+  # 1. Trigger whenever a Release is published
+  release:
+    types: [published]
+  
+  # 2. Allow manual triggering for ad-hoc downloads
+  workflow_dispatch:
+
+jobs:
+  build-binaries:
+    name: Build binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            ext: ""
+          - goos: windows
+            goarch: amd64
+            ext: ".exe"
+          - goos: darwin
+            goarch: arm64
+            ext: ""
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # THIS section ensures you always use the latest stable Go version
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'stable' # Always requests the latest stable version
+          check-latest: true   # Forces a check against official Go manifest
+
+     - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          # 1. Determine Version
+          # If triggered by a Tag (Release), use the tag name (e.g., v1.0.0)
+          # Otherwise, use 'dev-' followed by the short commit hash
+          if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
+            VERSION=${GITHUB_REF_NAME}
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          
+          # 2. Get Commit and Date
+          COMMIT=${GITHUB_SHA::7}
+          DATE=$(date +'%Y-%m-%dT%H:%M:%SZ')
+          
+          # 3. Build with -ldflags to inject variables
+          mkdir -p build
+          go build -v \
+            -ldflags "-X 'main.build=$VERSION' -X 'main.commit=$COMMIT' -X 'main.build-date=$DATE'" \
+            -o build/myapp-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./...
+
+          # Generate SHA256 Checksum
+          cd build
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            certutil -hashfile $FILENAME SHA256 > $FILENAME.sha256
+          else
+            shasum -a 256 $FILENAME > $FILENAME.sha256
+          fi
+
+      # Upload artifacts for MANUAL downloads (Actions tab)
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: build/*
+
+      # Upload binaries to Release page (Only if triggered by a Release)
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/*

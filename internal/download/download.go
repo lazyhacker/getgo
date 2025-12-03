@@ -1,4 +1,4 @@
-package lib
+package download
 
 import (
 	"archive/tar"
@@ -43,7 +43,7 @@ type goFilesStruct struct {
 // DownloadAndVerify downloads the Go binary that is passed in and verify
 // it against its sha256 checksum.  If there is already a local file
 // that matches the checksum then it will not download another version.
-func DownloadAndVerify(destdir, filename, checksum, extractDir string) error {
+func DownloadAndVerify(destdir, filename, checksum, extractDir string) (string, error) {
 
 	var filepath, calcSum string
 	var sumMatch bool
@@ -60,7 +60,7 @@ func DownloadAndVerify(destdir, filename, checksum, extractDir string) error {
 		if sumMatch {
 			log.Println("Existing file is the latest stable and checksum verified.  Skipping download.")
 			extractArchive(extractDir, filepath)
-			return nil
+			return "", nil
 		}
 	}
 
@@ -69,16 +69,16 @@ func DownloadAndVerify(destdir, filename, checksum, extractDir string) error {
 	download := fmt.Sprintf("%v/%v", GO_DOWNLOAD_URL, filename)
 	out, err := os.Create(filepath)
 	if err != nil {
-		return fmt.Errorf("unable to create %v locally. %v", filepath, err)
+		return "", fmt.Errorf("unable to create %v locally. %v", filepath, err)
 	}
 	defer out.Close()
 	resp, err := http.Get(download)
 	if err != nil {
-		return fmt.Errorf("unable to fetch the binary %v. %v", download, err)
+		return "", fmt.Errorf("unable to fetch the binary %v. %v", download, err)
 	}
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		return fmt.Errorf("unable to write %v. %v", filepath, err)
+		return "", fmt.Errorf("unable to write %v. %v", filepath, err)
 	}
 
 	log.Println("Download complete!  Verifying checksum...")
@@ -86,11 +86,11 @@ func DownloadAndVerify(destdir, filename, checksum, extractDir string) error {
 	sumMatch, calcSum = checksumMatch(filepath, checksum)
 	if !sumMatch {
 		os.Remove(filepath)
-		return fmt.Errorf("Calculated checksum %v != %v. Removing download.\n", calcSum, checksum)
+		return "", fmt.Errorf("Calculated checksum %v != %v. Removing download.\n", calcSum, checksum)
 	}
 
 	extractArchive(extractDir, filepath)
-	return nil
+	return filepath, nil
 
 }
 

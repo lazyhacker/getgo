@@ -1,3 +1,4 @@
+//go:build gui
 // +build gui
 
 package guimain
@@ -51,7 +52,7 @@ func (a *GetGo) downloadGo() {
 	a.lblChecksumValue.SetText(a.shasum)
 	prog := dialog.NewProgressInfinite("Downloading", "", a.parent)
 	prog.Show()
-	err := lib.DownloadAndVerify(a.savepath, a.filename, a.shasum, "")
+	_, err := lib.DownloadAndVerify(a.savepath, a.filename, a.shasum, "")
 	prog.Hide()
 	if err != nil {
 		dialog.ShowError(err, a.parent)
