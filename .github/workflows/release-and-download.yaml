@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-binaries:
+  build:
     name: Build binaries
     runs-on: ubuntu-latest
     strategy:
