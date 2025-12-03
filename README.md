@@ -1,6 +1,6 @@
-getgo checks https://golang.org/dl/?mode=json to determine the latest
-stable version of [Go](https://golang.org) to download and verifies its
-checksum.  The tool won't download the binary if a verified one already exists
+getgo checks https://golang.org/dl/?mode=json to download the latest
+stable version of [Go](https://golang.org) and verify its checksum.  
+The tool won't download the binary if a verified one already exists
 locally.
 
 It is command line utility with an experimental GUI mode that is only
@@ -12,8 +12,8 @@ half-baked.
 
 ### Pre-built Binaries
 
-Pre-built binaries are available in the releases section or it can be built if
-you already have Go installed:
+Pre-built binaries are available in the Releases section or be built 
+from source if you already have Go installed:
 
 `go get lazyhacker.dev/getgo`
 
@@ -23,7 +23,7 @@ If you've downloaded the source then the standard Go tool for building can be
 used:
 
 ```
-go build main.go
+go build .
 ```
 
 ## Usage
@@ -34,7 +34,7 @@ is running from.  To also extract the archive run it with the '-x' flag:
 ```
 getgo -x <dir to extract to>
 ```
-On Windows, getgo can be told to download the installer with
+On Windows, getgo can be told to download the installer with:
 
 ```
 getgo -kind installer
@@ -56,15 +56,16 @@ To get help info:
 
 ### Full Example
 
-I use getgo make it easier for me to upgrade Go when a new release comes out.
-The steps are generally:
+I use getgo make it easier for me to download Go when a new release comes out.
+
+Instead of:
 
 1. Download Go from golang.org.
-1. Verify the download.
-1. Delete /usr/local/go.
-1. Untar the downloaded .tar.gz file to /usr/local
+1. Verify the checksum.
+1. Delete the installed version of Go.
+1. Untar the downloaded .tar.gz.
 
-With getgo, this will do the above:
+It becomes:
 
 ```
 sudo rm /usr/local/go
