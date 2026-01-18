@@ -1,5 +1,5 @@
 getgo checks https://golang.org/dl/?mode=json to download the latest
-stable version of [Go](https://golang.org) and verify its checksum.  
+stable version of [Go](https://golang.org) and verify its checksum.
 The tool won't download the binary if a verified one already exists
 locally.
 
@@ -12,19 +12,20 @@ half-baked.
 
 ### Pre-built Binaries
 
-Pre-built binaries are available in the Releases section or be built 
-from source if you already have Go installed:
+Pre-built binaries are available in the [releases section](releases) where you
+can find the binary and the sha256sum file.
+
+To verify the binary against the sha256sum, download both files and:
+
+`sha256sum --check <shafile name>`
+
+If you already have Go installed:
 
 `go get lazyhacker.dev/getgo`
 
 ### Compile From Source
 
-If you've downloaded the source then the standard Go tool for building can be
-used:
-
-```
-go build .
-```
+Example of build command for the CLI and GUI version can be found in build.sh.
 
 ## Usage
 
